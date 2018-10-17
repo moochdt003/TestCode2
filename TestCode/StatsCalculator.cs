@@ -41,20 +41,24 @@ namespace TestCode
         //   Player Win % is Player.Wins over Player.Matches i.e. the sum of all players win / matches on the team.
         public IEnumerable<TeamValue> TeamWinPercentage(int teamId = 0)
         {
+            var teamValues = new List<TeamValue>();
+            var teams = teamId > 0 ? TeamReferenceData.Where(x => x.Id == teamId).ToList() : TeamReferenceData.ToList();
 
-            var team = TeamReferenceData.FirstOrDefault(x => x.Id == teamId);
-            var teamPlayers = teamId > 0
-                ? TeamReferenceData.FirstOrDefault(x => x.Id == teamId)?.Players.ToList()
-                : TeamReferenceData.SelectMany(x => x.Players).ToList();
-
-            return teamPlayers?.Select(x => new TeamValue
+            teams.ForEach(team =>
             {
-                Id = x.TeamId,
-                Name = GetTeamNameById(x.TeamId),
-                TeamWinsPercentage = CalculateTeamWinsPercentage(team),
-                PlayerWeighting = CalculatePlayerWeighting(x, teamPlayers),
-                PlayerWinPercentage = CalculatePlayerWinPercentage(teamPlayers)
+                var teamPlayers = team.Players.ToList();
+
+                teamValues.AddRange(team.Players.Select(player => new TeamValue
+                {
+                    Id = player.TeamId,
+                    Name = GetTeamNameById(player.TeamId),
+                    TeamWinsPercentage = CalculateTeamWinsPercentage(team),
+                    PlayerWeighting = CalculatePlayerWeighting(player, teamPlayers),
+                    PlayerWinPercentage = CalculatePlayerWinPercentage(teamPlayers)
+                }).ToList());
             });
+
+            return teamValues;
         }
 
         private string GetTeamNameById(int teamId)
@@ -70,11 +74,7 @@ namespace TestCode
 
         private double CalculatePlayerWeighting(Player player, List<Player> players)
         {
-            if (players.Any(x => x.Matches > 100))
-            {
-                return StatsWeighting.Apply(player.Wins, player.Matches);
-            }
-            return 0;
+            return players.Any(x => x.Matches >= 100) ? StatsWeighting.Apply(player.Wins, player.Matches) : 0;
         }
 
         private static double CalculateTeamWinsPercentage(Team team)
