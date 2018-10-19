@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestCode;
 using TestCode.Models;
+using TestCodeTests.TestCodeTestHelper;
 
 namespace TestCodeTests
 {
@@ -94,7 +95,7 @@ namespace TestCodeTests
             team.Players.Add(player);
 
             //Act
-            var actual = Math.Round(StatsCalculator.CalculatePlayerWinPercentage(team.Players), 2);
+            var actual = Math.Round(StatsCalculator.CalculatePlayersWinPercentage(team.Players), 2);
 
             //Assert
             Assert.AreEqual(10, actual);
@@ -134,22 +135,55 @@ namespace TestCodeTests
 
             };
             team.Players.Add(player);
-            var teams = new List<Team> {team};
+            var teams = new List<Team> { team };
             var statsCalculator = new StatsCalculator(teams, new StatsWeightingStub());
             var teamValue = new TeamValue
             {
-                Id = 1,Name = "DavidTeam",
+                Id = 1,
+                Name = "DavidTeam",
                 TeamWinsPercentage = 10,
                 PlayerWinPercentage = 10,
                 PlayerWeighting = 1
             };
-            var expected = new List<TeamValue>{ teamValue };
+            var expected = new List<TeamValue> { teamValue };
 
             //Act
             var actual = statsCalculator.TeamWinPercentage(1).ToList();
+            var teamValueComparer = new TeamValueComparer();
+            var result = teamValueComparer.Equals(expected.First(), actual.First());
+            //Assert
+            Assert.AreEqual(true, result);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void StatsWeightingStub_Appy_MatchesLessthan100_return_Exception()
+        {
+
+            //Arrange
+            var playerWinPercentage = 90;
+            var playerNumberOfMatches = 20;
+
+            //Act
+            var statsWeightingStub = new StatsWeightingStub();
+            var actual = statsWeightingStub.Apply(playerWinPercentage, playerNumberOfMatches);
+        }
+
+        [TestMethod]
+        public void StatsWeightingStub_Appy_MatchesGreaterthan100_return_1()
+        {
+
+            //Arrange
+            var playerWinPercentage = 90;
+            var playerNumberOfMatches = 120;
+            var expected = 1.0;
+
+            //Act
+            var statsWeightingStub = new StatsWeightingStub();
+            var actual = statsWeightingStub.Apply(playerWinPercentage, playerNumberOfMatches);
 
             //Assert
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

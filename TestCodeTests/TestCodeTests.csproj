@@ -61,6 +61,7 @@
     <Compile Include="StatsCalculatorTests.cs" />
     <Compile Include="StatsWeightingStub.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCodeTestHelper\TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestCode\TestCode.csproj">

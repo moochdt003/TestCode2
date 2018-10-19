@@ -32,12 +32,14 @@ namespace TestCode
                 Id = team.Id,
                 Name = team.Name,
                 TeamWinsPercentage = CalculateTeamWinsPercentage(team),
+                // Assessment instructions were not very clear. I had to assume weighting is based on the first player with over 100 matches.
+                // Assuming this because TeamValue object is team based not player based. Yet the method requires a player number of matches.
                 PlayerWeighting = CalculatePlayerWeighting(team.Players),
-                PlayerWinPercentage = CalculatePlayerWinPercentage(team.Players)
+                PlayerWinPercentage = CalculatePlayersWinPercentage(team.Players)
             });
         }
 
-        public static double CalculatePlayerWinPercentage(IEnumerable<Player> teamPlayers)
+        public static double CalculatePlayersWinPercentage(IEnumerable<Player> teamPlayers)
         {
             var players = teamPlayers.ToList();
             return (double)players.Sum(x => x.Wins) / players.Sum(x => x.Matches) * 100;
