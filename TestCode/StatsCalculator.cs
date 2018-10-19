@@ -35,6 +35,9 @@ namespace TestCode
                 // Assessment instructions were not very clear. I had to assume weighting is based on the first player with over 100 matches.
                 // Assuming this because TeamValue object is team based not player based. Yet the method requires a player number of matches.
                 PlayerWeighting = CalculatePlayerWeighting(team.Players),
+                //Another example of unclear instructions:
+                // Player Win % is Player.Wins over Player.Matches i.e. the sum of all players win / matches on the team.
+                // I had to assume this calculation is based on all the players within a specific team.
                 PlayerWinPercentage = CalculatePlayersWinPercentage(team.Players)
             });
         }
